@@ -1,4 +1,4 @@
-local function get(repoFile,saveTo)
+function get(repoFile,saveTo)
 local download = http.get("https://raw.githubusercontent.com/ilFau/test/master/"..repoFile)
 if download then 
    local handle = download.readAll()
@@ -10,5 +10,3 @@ if download then
    print("Unable to download the file "..repoFile)
   end 
 end 
-
-get("file1","offLineFile1") 
