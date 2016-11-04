@@ -1,4 +1,5 @@
 local position = {x=0,y=0,z=0,dir=0}
+local savePath = "util/SMVdata/dataPos"
 DIR = {"South", "West", "North", "East" } 
 
 SOUTH = 0
@@ -38,14 +39,14 @@ end
 
 --save the position on file
 function savePosition()
-	local save = fs.open("SMVdata/dataPos", "w")
+	local save = fs.open(savePath, "w")
 	save.write(textutils.serialize(position))
 	save.close()
 end
 
 --get the last position saved on file
 function restorePosition()
-	local save = fs.open("SMVdata/dataPos", "r")
+	local save = fs.open(savePath, "r")
 	if(save) then
 		local data = save.readAll()
 		position = textutils.unserialize(data)
