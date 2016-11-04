@@ -1,0 +1,71 @@
+os.loadAPI("c")
+os.loadAPI("smv")
+local saplingSlot = 1
+local wood = "log"
+local leaves = "leaves"
+
+local function ciopDown()
+	if(c.downIs(wood)) then
+		turtle.digDown()
+	end
+end
+
+local function ciopUp()
+	local height = 0
+	while c.upIs(wood) do
+		turtle.digUp()
+		turtle.up()
+		height = height+1
+	end
+	while not (height==0) do
+		if(turtle.down()) then
+			height = height-1
+		else
+			height = forceDown(height)
+		end	
+	end
+end
+
+local function killTheTree()
+	if c.forwardIs(wood) then
+		turtle.dig()
+		if(smv.forward()) then
+			ciopUp()
+			ciopDown()
+		end
+	else
+		return false
+	end
+	return true
+end
+
+local function forceDown(altezza)
+	if c.downIs(wood) or c.downIs(leaves) then
+		turtle.digDown()
+		if (turtle.down()) then
+			altezza = altezza - 1
+		end
+	end
+	return altezza
+end
+
+local function replantTree()
+	turtle.select(saplingSlot)
+	if turtle.placeDown() then
+		return true
+	else
+		return false
+	end
+end
+
+function start(noReplant)
+	if killTheTree() then	
+		if noReplant then 
+			return true
+		else
+			return replantTree()
+		end
+	else
+		return false
+	end
+end
