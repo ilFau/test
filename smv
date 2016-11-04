@@ -1,0 +1,211 @@
+local position = {x=0,y=0,z=0,dir=0}
+DIR = {"South", "West", "North", "East" } 
+
+SOUTH = 0
+WEST = 1
+NORTH = 2
+EAST = 3
+
+-- South= +z, East= +x 
+
+-- setter and call the save
+function setPosition(x, y, z, dir)
+ position.x = x
+ position.y = y
+ position.z = z
+ position.dir= dir
+ savePosition()
+end
+
+-- getter and call the saved file
+function getPosition() 
+	restorePosition()
+	return position
+end
+
+-- setter and call the save
+function setDirection(direction)
+	position.dir=direction
+	savePosition()
+end
+
+-- getter and call the saved file
+function getDirection()
+	restorePosition()
+	local result = position.dir
+	return result
+end
+
+--save the position on file
+function savePosition()
+	local save = fs.open("SMVdata/dataPos", "w")
+	save.write(textutils.serialize(position))
+	save.close()
+end
+
+--get the last position saved on file
+function restorePosition()
+	local save = fs.open("SMVdata/dataPos", "r")
+	if(save) then
+		local data = save.readAll()
+		position = textutils.unserialize(data)
+		save.close()
+		return true
+	else
+		return false
+	end
+end
+
+
+-- go up (coord. y)
+function up() 
+	local pos = getPosition()
+	pos.y = pos.y+1
+	if turtle.up() then
+		setPosition(pos.x,pos.y, pos.z, pos.dir)
+		return true
+	else
+		return false
+	end
+end
+
+-- go down (coord. y)
+function down() 
+	local pos = getPosition()
+	pos.y = pos.y-1
+	if turtle.down() then
+		setPosition(pos.x,pos.y, pos.z, pos.dir)
+		return true
+	else
+		return false
+	end
+end
+
+function frontToDir(xyz)
+	local dir=xyz.dir
+	if dir == SOUTH then
+		xyz.z = xyz.z + 1
+	elseif dir == EAST then
+		xyz.x = xyz.x + 1
+	elseif dir == NORTH then
+		xyz.z = xyz.z - 1
+	elseif dir == WEST then
+		xyz.x = xyz.x-1
+	end
+	return xyz
+end
+
+function invertDir(xyz)
+	local dir=math.fmod((xyz.dir+2), 4)
+	xyz.dir = dir
+	return xyz
+end
+
+-- move forward (coord. x o z)
+--commenti inutili: va avanti ma lo fa sembrare come se slittasse a destra
+function forward()
+	local pos = getPosition()
+	pos = frontToDir(pos)
+	if turtle.forward() then
+		setPosition(pos.x,pos.y, pos.z, pos.dir)
+		return true
+	else
+		return false
+	end
+end
+
+--moon walk!
+function back() 
+	local pos = getPosition()
+	pos = invertDir(pos)
+	pos = frontToDir(pos)
+	if turtle.back() then
+		pos = invertDir(pos)
+		setPosition(pos.x,pos.y, pos.z, pos.dir)
+		return true
+	else
+		return false
+	end
+end
+
+--commenti inutili: turnati a sinistra!
+function turnLeft()
+	direction = getDirection()
+	direction = math.fmod(direction+3, 4)
+	if(turtle.turnLeft()) then
+		setDirection(direction)
+		return true
+	else
+		return false
+	end
+end
+
+--commenti inutili: turnati a destra!
+function turnRight()
+	direction = getDirection()
+	direction = math.fmod(direction+1, 4)
+	if(turtle.turnRight()) then
+		setDirection(direction)
+		return true
+	else
+		return false
+	end
+end
+
+--commenti inutili: voltati e' alle tue spalle!!
+function turnBack()
+	if turnRight() then
+		return turnRight()
+	else 
+		return false
+	end
+end
+
+--commenti inutili: guarda la'
+function turnTo(direction)
+	while not(getDirection()==direction) do
+		turnLeft() --or turnRight()
+	end
+end
+
+-- turn to left e go forward
+-- gira a destra! (ci va) no no e' sinitra! sinitra!
+function left()
+	if turnLeft() then
+		return forward()
+	else
+		return false
+	end	
+end
+
+-- turn to right e go forward
+-- gira a sinistra! (ci va) folle! ho detto destra!
+function right() 
+	if turnRight() then
+		return forward()
+	else
+		return false
+	end
+end
+
+--jump for fun!
+--salta...gia'
+function jump()
+	if(turtle.up()) then
+		return turtle.down()
+	else
+		print("ouch!")
+		return false
+	end
+end
+
+--stamp of location
+function locString()
+	local pos = getPosition()
+	local result = "x:"..string.format('%i',pos.x)
+	.." y:"..string.format('%i',pos.y)
+	.." z:"..string.format('%i',pos.z)
+	.." Dir:"..DIR[(pos.dir+1)]
+  
+	return result
+end
