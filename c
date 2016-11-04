@@ -29,12 +29,12 @@ function forwardIs(strg)
 	return blockMatch(data, strg)
 end
 
-function DownIs(strg)
+function downIs(strg)
 	local success,data = turtle.inspectDown()
 	return blockMatch(data, strg)
 end
 
-function UpIs(strg)
+function upIs(strg)
 	local success,data = turtle.inspectUp()
 	return blockMatch(data, strg)
 end
