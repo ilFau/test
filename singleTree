@@ -1,13 +1,17 @@
-os.loadAPI("c")
-os.loadAPI("smv")
+os.loadAPI("util/c")
+os.loadAPI("util/smv")
 local saplingSlot = 1
 local wood = "log"
 local leaves = "leaves"
 
 local function ciopDown()
-	if(c.downIs(wood)) then
+	if (c.downIs(wood)) then
 		turtle.digDown()
 	end
+end
+
+function setSaplingSlot(num)
+	saplingSlot = num
 end
 
 local function ciopUp()
@@ -60,11 +64,10 @@ end
 
 function start(noReplant)
 	if killTheTree() then	
-		if noReplant then 
-			return true
-		else
-			return replantTree()
+		if not(noReplant) then 
+			replantTree()
 		end
+		return true
 	else
 		return false
 	end
